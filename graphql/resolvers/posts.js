@@ -97,7 +97,7 @@ module.exports = {
                 user.posts = user.posts.filter((p) => p != postId);
                 await user.save();
 
-                return "Removed post successfully";
+                return post;
             } catch (err) {
                 console.log(err);
                 return err;
@@ -107,26 +107,22 @@ module.exports = {
             try {
                 const { id, username } = validateToken(context);
                 const post = await Post.findById(postId);
-                const user = await User.findById(id);
 
                 if (post.likes.find((like) => like.userId === id)) {
                     post.likes = post.likes.filter((like) => like.userId !== id);
-                    user.likes = user.likes.filter((pId) => pId !== postId);
                 } else {
                     post.likes.push({
                         userId: id,
                         username: username,
                         createdAt: new Date().toISOString()
                     });
-                    user.likes.push(postId);
                 }
 
                 await post.save();
-                await user.save();
 
                 // TODO - Add like to user record - done
 
-                return "Toggled like successfully";
+                return post;
             } catch (err) {
                 console.log(err);
                 return err;

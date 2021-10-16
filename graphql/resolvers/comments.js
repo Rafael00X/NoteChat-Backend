@@ -20,14 +20,6 @@ module.exports = {
                 const post = await Post.findById(postId);
                 post.comments.push(newComment);
                 post.save();
-
-                // Save comment to user
-                /*
-                const user = await User.findById(id);
-                user.comments.push(postId);
-                await user.save();
-                */
-
                 return post;
             } catch (err) {
                 console.log(err);
@@ -43,14 +35,6 @@ module.exports = {
                 const post = await Post.findById(postId);
                 post.comments = post.comments.filter((comment) => comment.id !== commentId);
                 await post.save();
-
-                // Save comment to user
-                /*
-                const user = await User.findById(id);
-                user.comments = user.comments.filter((pId) => pId !== postId);
-                await user.save();
-                */
-
                 return post;
             } catch (err) {
                 console.log(err);

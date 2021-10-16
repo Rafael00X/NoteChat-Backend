@@ -12,18 +12,6 @@ function generateToken(user) {
         { expiresIn: "1h" }
     );
 }
-/*
-function validateToken(token) {
-    if (token) {
-        try {
-            const user = jwt.verify(token, SECRET_KEY);
-            return user;
-        } catch (err) {
-            throw new Error("Invalid/Expired token");
-        }
-    }
-}
-*/
 
 function validateToken(context) {
     const authHeader = context.headers.authorization;
@@ -34,7 +22,7 @@ function validateToken(context) {
                 const user = jwt.verify(token, SECRET_KEY);
                 return user;
             } catch (err) {
-                throw new AuthenticationError("Invalid/Expired token");
+                throw new Error("Invalid/Expired token");
             }
         }
         throw new Error("Authorization token must be 'Bearer [token]");
