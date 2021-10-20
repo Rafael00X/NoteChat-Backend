@@ -35,7 +35,7 @@ module.exports = {
     Mutation: {
         async createPost(_, { body }, context) {
             try {
-                if (body === "") {
+                if (body.trim() === "") {
                     throw new UserInputError("Post cannot be empty");
                 }
                 const { id, username } = validateToken(context);

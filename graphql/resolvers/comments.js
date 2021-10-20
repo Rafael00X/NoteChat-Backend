@@ -6,7 +6,7 @@ module.exports = {
     Mutation: {
         async createComment(_, { postId, body }, context) {
             try {
-                if (body === "") {
+                if (body.trim() === "") {
                     throw new Error("Comment cannot be empty");
                 }
                 const { id, username } = validateToken(context);
