@@ -35,14 +35,29 @@ const typeDefs = gql`
         username: String!
         password: String!
         createdAt: String!
-        chats: [ID]!
+        conversations: [ID]!
         posts: [ID]!
         token: String!
+    }
+
+    type Message {
+        id: ID
+        userId: ID!
+        body: String!
+        createdAt: String!
+    }
+
+    type Conversation {
+        id: ID!
+        userIds: [ID]!
+        messages: [Message]!
+        createdAt: String!
     }
 
     type Query {
         getPosts: [Post]!
         getPost(postId: ID!): Post
+        getConversation(conversationId: ID!): Conversation
     }
 
     type Mutation {
@@ -54,6 +69,10 @@ const typeDefs = gql`
         likePost(postId: ID!): Post!
         createComment(postId: ID!, body: String!): Post!
         deleteComment(postId: ID!, userId: ID!, commentId: ID!): Post!
+
+        createConversation(userIds: [ID]!): Conversation!
+        createMessage(conversationId: ID, userId: ID!, body: String!): Conversation!
+        deleteMessage(conversationId: ID!, messageId: ID!): Conversation!
     }
 `;
 
