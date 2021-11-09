@@ -2,6 +2,7 @@ const { UserInputError, AuthenticationError } = require("apollo-server-errors");
 
 const Conversation = require("../../models/Conversation");
 const User = require("../../models/User");
+const Message = require("../../models/Message");
 const { validateToken } = require("../../util/authorization");
 
 module.exports = {
@@ -63,14 +64,16 @@ module.exports = {
                 if (!conv.userIds.includes(id)) {
                     throw new AuthenticationError("Not your conversation");
                 }
-                const newMessage = {
+
+                const newMessage = new Message({
                     userId: id,
                     body,
                     createdAt: new Date().toISOString()
-                };
+                });
+
                 conv.messages.push(newMessage);
                 await conv.save();
-                return conv;
+                return newMessage;
             } catch (err) {
                 console.log(err);
                 return err;

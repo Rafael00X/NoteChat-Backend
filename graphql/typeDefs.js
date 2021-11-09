@@ -71,7 +71,7 @@ const typeDefs = gql`
         deleteComment(postId: ID!, userId: ID!, commentId: ID!): Post!
 
         createConversation(userIds: [ID]!): Conversation!
-        createMessage(conversationId: ID, userId: ID!, body: String!): Conversation!
+        createMessage(conversationId: ID!, body: String!): Message!
         deleteMessage(conversationId: ID!, messageId: ID!): Conversation!
     }
 `;
