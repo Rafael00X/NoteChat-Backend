@@ -29,3 +29,31 @@ mongoose
     .catch((err) => {
         console.error(err);
     });
+
+// Socket
+
+const { Server } = require("socket.io");
+const io = new Server(9000, {
+    cors: {
+        origin: "*"
+    }
+});
+
+io.on("connection", (clientSocket) => {
+    const id = clientSocket.handshake.query.id;
+    clientSocket.join(id);
+    console.log("Connected: " + clientSocket.id);
+
+    clientSocket.on("send-message", ({ conversationId, recipient, message }) => {
+        clientSocket.broadcast.to(recipient).emit("receive-message", { conversationId, message });
+        console.log("Send message to user " + recipient);
+    });
+
+    /*
+
+    clientSocket.on("send-message", (message) => {
+        clientSocket.broadcast.emit("receive-message", message);
+        console.log(message);
+    });
+    */
+});
