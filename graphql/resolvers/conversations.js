@@ -1,4 +1,5 @@
 const { UserInputError, AuthenticationError } = require("apollo-server-errors");
+const mongoose = require("mongoose");
 
 const Conversation = require("../../models/Conversation");
 const User = require("../../models/User");
@@ -28,20 +29,16 @@ module.exports = {
                 if (!userIds.includes(id)) {
                     throw new AuthenticationError("Cannot create conversations as third member");
                 }
+
+                userIds.sort();
+                const _id = userIds[0] + userIds[1];
                 const newConv = new Conversation({
+                    _id,
                     userIds,
                     messages: [],
                     createdAt: new Date().toISOString()
                 });
 
-                // TODO - Add to user
-                /*
-                for (let i = 0; i < userIds.length; i++) {
-                    const user = await User.findById(userId);
-                    user.conversations.push(conv.id);
-                    await user.save();
-                }
-                */
                 const conv = await newConv.save();
 
                 userIds.forEach(async (userId) => {
@@ -50,7 +47,7 @@ module.exports = {
                     await user.save();
                 });
 
-                return conv;
+                return newConv;
             } catch (err) {
                 console.log(err);
                 return err;
@@ -70,6 +67,8 @@ module.exports = {
                     body,
                     createdAt: new Date().toISOString()
                 });
+
+                console.log(newMessage);
 
                 conv.messages.push(newMessage);
                 await conv.save();
