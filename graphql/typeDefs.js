@@ -54,10 +54,16 @@ const typeDefs = gql`
         createdAt: String!
     }
 
+    type Profile {
+        userId: ID!
+        username: String!
+    }
+
     type Query {
         getPosts: [Post]!
         getPost(postId: ID!): Post
         getConversation(conversationId: ID!): Conversation
+        getProfile(userId: ID!): Profile
     }
 
     type Mutation {
@@ -71,7 +77,7 @@ const typeDefs = gql`
         deleteComment(postId: ID!, userId: ID!, commentId: ID!): Post!
 
         createConversation(userIds: [ID]!): Conversation!
-        createMessage(conversationId: ID!, body: String!): Message!
+        createMessage(conversationId: ID, recipientId: ID!, body: String!): Message!
         deleteMessage(conversationId: ID!, messageId: ID!): Conversation!
     }
 `;

@@ -2,10 +2,28 @@ const bcrypt = require("bcryptjs");
 const { UserInputError } = require("apollo-server");
 
 const User = require("../../models/User");
-const { generateToken } = require("../../util/authorization");
+const { generateToken, validateToken } = require("../../util/authorization");
 const { validateRegisterInput, validateLoginInput } = require("../../util/authentication");
 
 module.exports = {
+    Query: {
+        async getProfile(_, { userId }, context) {
+            try {
+                validateToken(context);
+                const user = await User.findById(userId);
+                if (!user) return null;
+                const profile = {
+                    userId: user.id,
+                    username: user.username
+                };
+                return profile;
+            } catch (err) {
+                console.log(err);
+                return err;
+            }
+        }
+    },
+
     Mutation: {
         async register(_, { username, email, password }) {
             try {

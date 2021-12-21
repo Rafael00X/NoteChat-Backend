@@ -45,7 +45,8 @@ io.on("connection", (clientSocket) => {
     console.log("Connected: " + clientSocket.id);
 
     clientSocket.on("send-message", ({ conversationId, recipient, message }) => {
-        clientSocket.broadcast.to(recipient).emit("receive-message", { conversationId, message });
+        clientSocket.emit("receive-message", { conversationId, message });
+        clientSocket.to(recipient).emit("receive-message", { conversationId, message });
         console.log("Send message to user " + recipient);
     });
 
