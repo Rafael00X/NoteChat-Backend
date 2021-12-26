@@ -59,29 +59,19 @@ module.exports = {
         async createMessage(_, { conversationId, recipientId, body }, context) {
             try {
                 const { id } = validateToken(context);
-                let conv = null;
-                if (conversationId) {
-                    conv = await Conversation.findById(conversationId);
-                }
-
-                if (conv && !conv.userIds.includes(id)) {
-                    throw new AuthenticationError("Not your conversation");
-                }
+                let conv = await Conversation.findById(conversationId);
 
                 if (!conv) {
-                    const userIds = [id, recipientId];
-                    userIds.sort();
-                    const _id = userIds[0] + userIds[1];
                     const newConv = new Conversation({
-                        _id,
-                        userIds,
+                        _id: conversationId,
+                        userIds: [id, recipientId],
                         messages: [],
                         createdAt: new Date().toISOString()
                     });
 
                     conv = await newConv.save();
 
-                    userIds.forEach(async (userId) => {
+                    conv.userIds.forEach(async (userId) => {
                         const user = await User.findById(userId);
                         user.conversations.push(conv.id);
                         await user.save();
