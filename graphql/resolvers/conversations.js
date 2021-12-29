@@ -20,6 +20,43 @@ module.exports = {
                 console.log(err);
                 return err;
             }
+        },
+
+        async getConversations(_, { conversationIds }, context) {
+            try {
+                const { id } = validateToken(context);
+
+                let convs = [];
+                for (const convId of conversationIds) {
+                    const c = await Conversation.findById(convId);
+                    if (c === null) continue;
+                    convs.push(c);
+                }
+
+                console.log("Before sorting\n" + convs.map((c) => c.id));
+                convs.sort((a, b) => {
+                    let ta = a.messages.splice(-1)[0].createdAt;
+                    let tb = b.messages.splice(-1)[0].createdAt;
+                    return tb.localeCompare(ta);
+                });
+                console.log("After sorting\n" + convs.map((c) => c.id));
+
+                let data = [];
+                for (const conv of convs) {
+                    const u = await User.findById(conv.userIds.find((i) => i !== id));
+                    const d = {
+                        conversationId: conv.id,
+                        userId: u.id,
+                        username: u.username
+                    };
+                    data.push(d);
+                }
+
+                return data;
+            } catch (err) {
+                console.log(err);
+                return err;
+            }
         }
     },
     Mutation: {

@@ -59,11 +59,18 @@ const typeDefs = gql`
         username: String!
     }
 
+    type ConvPreview {
+        conversationId: ID!
+        userId: ID!
+        username: String!
+    }
+
     type Query {
         getPosts: [Post]!
         getPost(postId: ID!): Post
         getConversation(conversationId: ID!): Conversation
         getProfile(userId: ID!): Profile
+        getConversations(conversationIds: [ID]): [ConvPreview]
     }
 
     type Mutation {

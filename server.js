@@ -44,17 +44,11 @@ io.on("connection", (clientSocket) => {
     clientSocket.join(id);
     console.log("Connected: " + clientSocket.id);
 
-    clientSocket.on("send-message", ({ conversationId, recipient, message }) => {
-        clientSocket.emit("receive-message", { conversationId, message });
-        clientSocket.to(recipient).emit("receive-message", { conversationId, message });
-        console.log("Send message to user " + recipient);
-    });
+    // data = { conversationId, recipient, senderId, senderName, message}
 
-    /*
-
-    clientSocket.on("send-message", (message) => {
-        clientSocket.broadcast.emit("receive-message", message);
-        console.log(message);
+    clientSocket.on("send-message", (data) => {
+        clientSocket.emit("receive-message", data);
+        clientSocket.to(data.recipient).emit("receive-message", data);
+        console.log("Send message to user " + data.recipient);
     });
-    */
 });
