@@ -33,13 +33,13 @@ module.exports = {
                     convs.push(c);
                 }
 
-                console.log("Before sorting\n" + convs.map((c) => c.id));
+                //console.log("Before sorting\n" + convs.map((c) => c.id));
                 convs.sort((a, b) => {
-                    let ta = a.messages.splice(-1)[0].createdAt;
-                    let tb = b.messages.splice(-1)[0].createdAt;
+                    let ta = a.messages[a.messages.length - 1].createdAt;
+                    let tb = b.messages[b.messages.length - 1].createdAt;
                     return tb.localeCompare(ta);
                 });
-                console.log("After sorting\n" + convs.map((c) => c.id));
+                //console.log("After sorting\n" + convs.map((c) => c.id));
 
                 let data = [];
                 for (const conv of convs) {
@@ -52,6 +52,35 @@ module.exports = {
                     data.push(d);
                 }
 
+                return data;
+            } catch (err) {
+                console.log(err);
+                return err;
+            }
+        },
+
+        async fetchConversations(_, { conversationIds }, context) {
+            console.log("In fetchConversations");
+            try {
+                const { id } = validateToken(context);
+                const convs = [];
+                for (const convId of conversationIds) {
+                    const c = await Conversation.findById(convId);
+                    if (c === null) continue;
+                    convs.push(c);
+                }
+                const data = [];
+                for (const conv of convs) {
+                    const u = await User.findById(conv.userIds.find((i) => i !== id));
+                    const d = {
+                        conversation: conv,
+                        profile: {
+                            userId: u.id,
+                            username: u.username
+                        }
+                    };
+                    data.push(d);
+                }
                 return data;
             } catch (err) {
                 console.log(err);
@@ -93,21 +122,39 @@ module.exports = {
         },
         */
 
+        async deleteConversation(parent, { conversationId }) {
+            console.log("Deleting");
+            try {
+                const conv = await Conversation.findById(conversationId);
+                if (!conv) return;
+                conv.userIds.forEach(async (userId) => {
+                    const user = await User.findById(userId);
+                    user.conversations = user.conversations.filter((c) => c !== conversationId);
+                    await user.save();
+                });
+
+                await Conversation.deleteOne({ _id: conversationId });
+            } catch (err) {
+                console.log(err);
+                return err;
+            }
+        },
+
         async createMessage(_, { conversationId, recipientId, body }, context) {
             try {
                 const { id } = validateToken(context);
+                let isNew = false;
                 let conv = await Conversation.findById(conversationId);
 
                 if (!conv) {
+                    isNew = true;
                     const newConv = new Conversation({
                         _id: conversationId,
                         userIds: [id, recipientId],
                         messages: [],
                         createdAt: new Date().toISOString()
                     });
-
                     conv = await newConv.save();
-
                     conv.userIds.forEach(async (userId) => {
                         const user = await User.findById(userId);
                         user.conversations.push(conv.id);
@@ -120,12 +167,29 @@ module.exports = {
                     body,
                     createdAt: new Date().toISOString()
                 });
-
-                console.log(newMessage);
-
                 conv.messages.push(newMessage);
                 await conv.save();
-                return newMessage;
+
+                // Changed here
+                const result = {
+                    message: newMessage,
+                    conversation: null,
+                    users: null
+                };
+                if (isNew) {
+                    console.log(conv);
+                    const users = [];
+                    for (const userId of conv.userIds) {
+                        const u = await User.findById(userId);
+                        users.push({
+                            userId: u.id,
+                            username: u.username
+                        });
+                    }
+                    result.conversation = conv;
+                    result.users = users;
+                }
+                return result;
             } catch (err) {
                 console.log(err);
                 return err;

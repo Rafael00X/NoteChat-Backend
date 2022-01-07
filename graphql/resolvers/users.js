@@ -21,6 +21,17 @@ module.exports = {
                 console.log(err);
                 return err;
             }
+        },
+
+        async getUser(parent, args, context) {
+            try {
+                const { id } = validateToken(context);
+                const user = await User.findById(id);
+                return user;
+            } catch (err) {
+                console.log(err);
+                return err;
+            }
         }
     },
 

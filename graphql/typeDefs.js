@@ -65,12 +65,25 @@ const typeDefs = gql`
         username: String!
     }
 
+    type FetchConv {
+        conversation: Conversation!
+        profile: Profile!
+    }
+
+    type MessageResponse {
+        message: Message
+        conversation: Conversation
+        users: [Profile]
+    }
+
     type Query {
         getPosts: [Post]!
         getPost(postId: ID!): Post
         getConversation(conversationId: ID!): Conversation
         getProfile(userId: ID!): Profile
         getConversations(conversationIds: [ID]): [ConvPreview]
+        getUser: User!
+        fetchConversations(conversationIds: [ID!]): [FetchConv!]
     }
 
     type Mutation {
@@ -84,8 +97,9 @@ const typeDefs = gql`
         deleteComment(postId: ID!, userId: ID!, commentId: ID!): Post!
 
         createConversation(userIds: [ID]!): Conversation!
-        createMessage(conversationId: ID, recipientId: ID!, body: String!): Message!
+        createMessage(conversationId: ID, recipientId: ID!, body: String!): MessageResponse!
         deleteMessage(conversationId: ID!, messageId: ID!): Conversation!
+        deleteConversation(conversationId: ID!): String
     }
 `;
 
