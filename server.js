@@ -31,7 +31,7 @@ mongoose
     });
 
 // Socket
-
+/*
 const { Server, Socket } = require("socket.io");
 const io = new Server(9000, {
     cors: {
@@ -64,3 +64,4 @@ io.on("connection", (clientSocket) => {
         // console.log("Send conv to user " + data.recipient);
     });
 });
+*/
