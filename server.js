@@ -14,7 +14,7 @@ const server = new ApolloServer({
 });
 
 // Connect to DB
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3001;
 const URL = process.env.DATABASE_URL;
 
 mongoose
