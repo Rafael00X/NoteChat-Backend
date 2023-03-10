@@ -5,6 +5,10 @@ require("dotenv").config();
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers/index");
 
+const GRAPHQL_PORT = 3001;
+const SOCKET_PORT = 3002;
+const DATABASE_URL = process.env.DATABASE_URL;
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -13,18 +17,14 @@ const server = new ApolloServer({
   }),
 });
 
-// Connect to DB
-const PORT = process.env.PORT || 3001;
-const URL = process.env.DATABASE_URL;
-
 mongoose
-  .connect(URL)
+  .connect(DATABASE_URL)
   .then(() => {
     console.log("Successfully connected to database");
-    return server.listen({ port: PORT });
+    return server.listen({ port: GRAPHQL_PORT });
   })
   .then((res) => {
-    console.log(`Server running at ${res.url}`);
+    console.log("Server running");
   })
   .catch((err) => {
     console.error(err);
@@ -33,7 +33,7 @@ mongoose
 /*** SocketIO ***/
 
 const { Server } = require("socket.io");
-const io = new Server(3002, {
+const io = new Server(SOCKET_PORT, {
   cors: {
     origin: "*",
   },
