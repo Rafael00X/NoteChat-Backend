@@ -1,1 +1,0 @@
-Fix comment structure in user object
